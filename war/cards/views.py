@@ -51,7 +51,9 @@ def suit_filter(request):
 @login_required
 def profile(request):
     return render(request, 'profile.html', {
-        'games': WarGame.objects.filter(player=request.user)
+        'games': WarGame.objects.filter(player=request.user),
+        'wins': request.user.get_wins(),
+        'losses': request.user.get_losses()
     })
 
 
