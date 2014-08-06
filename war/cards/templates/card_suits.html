@@ -1,0 +1,5 @@
+{% load list_filters %}
+
+{% for card in cards|suit:"diamond"  %}
+    <p>Suit: {{ card.get_suit_display }}, Rank: {{ card.rank }}</p>
+{% endfor %}

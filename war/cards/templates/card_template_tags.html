@@ -1,0 +1,14 @@
+<style>
+    .odd {
+        color: blue;
+    }
+</style>
+
+
+It's {% now "SHORT_DATETIME_FORMAT" %}!
+
+{% for card in cards %}
+    <p class="{% cycle 'even' 'odd' %}">
+        Suit: {{ card.get_suit_display }}, Rank: {{ card.rank }}
+    </p>
+{% endfor %}

@@ -1,0 +1,26 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+        <script src="{% static "js/cards.js" %}"></script>
+        <link rel="stylesheet" type="text/css" href="{% static "css/cards.css" %}">
+    </head>
+    <body>
+        <div>
+            <img id="joker" width="40px" src="{% static "img/red_joker.jpg" %}">
+            <a href="{% url "profile" %}">Profile</a> |  <a href="{% url "faq" %}">FAQ</a> | <a href="{% url "war" %}">War</a>
+
+            <span style="float:right;">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'logout' %}">Logout</a>
+                {% else %}
+                    <a href="{% url 'login' %}">Login</a> | <a href="{% url 'register' %}">Register</a>
+                {% endif %}
+            </span>
+        </div>
+        <h1>Welcome to our Card Game!</h1>
+        {% block content %}{% endblock content %}
+    </body>
+</html>

@@ -1,0 +1,27 @@
+{% extends 'base_template.html' %}
+
+{% block content %}
+    <h2>War!</h2>
+
+    <div style="float:left; margin-right: 50px;">
+        <h3>Player's Card</h3>
+        {% include 'includes/hand2.html' with cards=user_cards %}
+    </div>
+
+    <div style="float: left;">
+        <h3>Dealer's Card</h3>
+        {% include 'includes/hand2.html' with cards=dealer_cards %}
+    </div>
+
+    <div style="clear:both;"></div>
+
+    <div style="margin-top:30px;">
+        {% if result == 1 %}
+            <h2>You won!</h2>
+        {% elif result == 0 %}
+            <h2>You tied.</h2>
+        {% else %}
+            <h2>You lost...</h2>
+        {% endif %}
+    </div>
+{% endblock content %}
