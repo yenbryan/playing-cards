@@ -24,9 +24,40 @@ class ModelTestCase(TestCase):
     def setUp(self):
         self.card = Card.objects.create(suit=Card.CLUB, rank="jack")
 
+    def create_war_game(self, user, result=WarGame.LOSS):
+        WarGame.objects.create(result=result, player=user)
+
     def test_get_ranking(self):
         """Test that we get the proper ranking for a card"""
         self.assertEqual(self.card.get_ranking(), 11)
+
+    def test_get_war_result_greater(self):
+        first_card = Card.objects.create(suit=Card.DIAMOND, rank="five")
+        second_card = Card.objects.create(suit=Card.DIAMOND, rank="four")
+        self.assertEqual(first_card.get_war_result(second_card), 1)
+
+    def test_get_war_result_equal(self):
+        first_card = Card.objects.create(suit=Card.DIAMOND, rank="five")
+        second_card = Card.objects.create(suit=Card.DIAMOND, rank="five")
+        self.assertEqual(first_card.get_war_result(second_card), 0)
+
+    def test_get_war_result_less(self):
+        first_card = Card.objects.create(suit=Card.DIAMOND, rank="four")
+        second_card = Card.objects.create(suit=Card.DIAMOND, rank="five")
+        self.assertEqual(first_card.get_war_result(second_card), -1)
+
+    def test_get_wins(self):
+        user = Player.objects.create_user(username='test-user', email='test@test.com', password='password')
+        self.create_war_game(user, WarGame.WIN)
+        self.create_war_game(user, WarGame.WIN)
+        self.assertEqual(user.get_wins(), 2)
+
+    def test_get_losses(self):
+        user = Player.objects.create_user(username='test-user', email='test@test.com', password='password')
+        self.create_war_game(user, WarGame.LOSS)
+        self.create_war_game(user, WarGame.LOSS)
+        self.create_war_game(user, WarGame.LOSS)
+        self.assertEqual(user.get_losses(), 3)
 
 
 class ViewTestCase(TestCase):
@@ -37,6 +68,26 @@ class ViewTestCase(TestCase):
         response = self.client.get(reverse('home'))
         self.assertIn('<p>Suit: spade, Rank: two</p>', response.content)
         self.assertEqual(response.context['cards'].count(), 52)
+
+    def test_faq_page(self):
+        response = self.client.get(reverse('faq'))
+        self.assertInHTML('<p>Q: Can I win real money on this website?</p>', response.content)
+
+    def test_filters_page(self):
+        response = self.client.get(reverse('filters'))
+        self.assertIn('Uppercased Rank: ACE', response.content)
+        self.assertEqual(response.context['cards'].count(), 52)
+
+    def test_login_page(self):
+        password = 'passsword'
+        user = Player.objects.create_user(username='test-user', email='test@test.com', password=password)
+
+        data = {
+            'username': user.username,
+            'password': password
+        }
+        response = self.client.post(reverse('login'), data)
+        # self.assertIsInstance(HttpResponseRedirect, response)
 
     def test_register_page(self):
         username = 'new-user'
@@ -66,12 +117,17 @@ class ViewTestCase(TestCase):
 
         # Set up some war game entries
         self.create_war_game(user)
+        self.create_war_game(user)
+        self.create_war_game(user)
+        self.create_war_game(user, WarGame.WIN)
         self.create_war_game(user, WarGame.WIN)
 
         # Make the url call and check the html and games queryset length
         response = self.client.get(reverse('profile'))
-        self.assertInHTML('<p>Your email address is {}</p>'.format(user.email), response.content)
-        self.assertEqual(len(response.context['games']), 2)
+        self.assertInHTML('<p>Hi {}, you have 2 wins and 3 losses.</p>'.format(user.username), response.content)
+        self.assertEqual(len(response.context['games']), 5)
+        self.assertEqual(response.context['wins'], 2)
+        self.assertEqual(response.context['losses'], 3)
 
 
 class UtilTestCase(TestCase):
@@ -82,11 +138,6 @@ class UtilTestCase(TestCase):
 
 
 class FormTestCase(TestCase):
-    def test_clean_username(self):
-        form = EmailUserCreationForm()
-        form.cleaned_data = {'username': 'test-user'}
-        self.assertTrue(form.clean_username())
-
     def test_clean_username_exception(self):
         # Create a player so that this username we're testing is already taken
         Player.objects.create_user(username='test-user')
@@ -98,6 +149,12 @@ class FormTestCase(TestCase):
         # use a context manager to watch for the validation error being raised
         with self.assertRaises(ValidationError):
             form.clean_username()
+
+    def test_clean_username(self):
+        # set up the form for testing
+        form = EmailUserCreationForm()
+        form.cleaned_data = {'username': 'test-user'}
+        self.assertEquals(form.clean_username(), 'test-user')
 
 
 class TemplateTagTestCase(TestCase):
