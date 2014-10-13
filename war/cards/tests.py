@@ -1,3 +1,4 @@
+from django.core import mail
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
@@ -12,7 +13,7 @@ class BasicMathTestCase(TestCase):
     def test_math(self):
         a = 1
         b = 1
-        self.assertEqual(a+b, 2)
+        self.assertEqual(a + b, 2)
 
     # def test_failing_case(self):
     #     a = 1
@@ -155,6 +156,18 @@ class FormTestCase(TestCase):
         form = EmailUserCreationForm()
         form.cleaned_data = {'username': 'test-user'}
         self.assertEquals(form.clean_username(), 'test-user')
+
+    def test_register_sends_email(self):
+        form = EmailUserCreationForm()
+        form.cleaned_data = {
+            'username': 'test',
+            'email': 'test@test.com',
+            'password1': 'test-pw',
+            'password2': 'test-pw',
+        }
+        form.save()
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].subject, 'Welcome!')
 
 
 class TemplateTagTestCase(TestCase):
