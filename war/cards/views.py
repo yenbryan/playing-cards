@@ -82,11 +82,11 @@ def register(request):
         form = EmailUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            # text_content = 'Thank you for signing up for our website, {}'.format(user.username)
-            # html_content = '<h2>Thanks {} for signing up!</h2> <div>I hope you enjoy using our site</div>'.format(user.username)
-            # msg = EmailMultiAlternatives("Welcome!", text_content, settings.DEFAULT_FROM_EMAIL, [user.email])
-            # msg.attach_alternative(html_content, "text/html")
-            # msg.send()
+            text_content = 'Thank you for signing up for our website, {}'.format(user.username)
+            html_content = '<h2>Thanks {} for signing up!</h2> <div>I hope you enjoy using our site</div>'.format(user.username)
+            msg = EmailMultiAlternatives("Welcome!", text_content, settings.DEFAULT_FROM_EMAIL, [user.email])
+            msg.attach_alternative(html_content, "text/html")
+            msg.send()
             return redirect("profile")
     else:
         form = EmailUserCreationForm()
