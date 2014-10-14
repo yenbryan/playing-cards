@@ -1,0 +1,10 @@
+{% extends 'base_template.html' %}
+
+{% block content %}
+    <h2>Some Random Inspiration</h2>
+    <div>
+        <h3>{{ comic.safe_title }} - {{ comic.year }}</h3>
+        <img alt="{{ comic.alt }}" src="{{ comic.img }}">
+        <p>{{ comic.transcript }}</p>
+    </div>
+{% endblock content %}

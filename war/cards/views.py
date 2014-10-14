@@ -2,14 +2,13 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from cards.forms import EmailUserCreationForm
 from cards.models import Card, WarGame
+from cards.utils import get_random_comic
 
 
 def home(request):
-    data = {
-        'cards': Card.objects.all()
-    }
-
-    return render(request, 'cards.html', data)
+    return render(request, 'home.html', {
+        'comic': get_random_comic()
+    })
 
 
 def filters(request):

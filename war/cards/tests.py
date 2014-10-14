@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.test import TestCase
+from mock import patch, Mock
 from cards.forms import EmailUserCreationForm
 from cards.utils import create_deck
 from cards.models import Card, Player, WarGame
@@ -65,10 +66,26 @@ class ViewTestCase(TestCase):
     def setUp(self):
         create_deck()
 
-    def test_home_page(self):
+    @patch('cards.utils.requests')
+    def test_home_page(self, mock_requests):
+        mock_comic = {
+            'num': 1433,
+            'year': "2014",
+            'safe_title': "Lightsaber",
+            'alt': "A long time in the future, in a galaxy far, far, away.",
+            'transcript': "An unusual gamma-ray burst originating from somewhere far across the universe.",
+            'img': "http://imgs.xkcd.com/comics/lightsaber.png",
+            'title': "Lightsaber",
+        }
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = mock_comic
+        mock_requests.get.return_value = mock_response
+
         response = self.client.get(reverse('home'))
-        self.assertIn('<p>Suit: spade, Rank: two</p>', response.content)
-        self.assertEqual(response.context['cards'].count(), 52)
+        self.assertIn('<h3>{} - {}</h3>'.format(mock_comic['safe_title'], mock_comic['year']), response.content)
+        self.assertIn('<img alt="{}" src="{}">'.format(mock_comic['alt'], mock_comic['img']), response.content)
+        self.assertIn('<p>{}</p>'.format(mock_comic['transcript']), response.content)
 
     def test_faq_page(self):
         response = self.client.get(reverse('faq'))
@@ -87,8 +104,7 @@ class ViewTestCase(TestCase):
             'username': user.username,
             'password': password
         }
-        response = self.client.post(reverse('login'), data)
-        # self.assertIsInstance(HttpResponseRedirect, response)
+        self.client.post(reverse('login'), data)
 
     def test_register_page(self):
         username = 'new-user'
