@@ -2,9 +2,14 @@
 Django==1.7
 Pillow==2.5.1
 coverage==3.7.1
+django-debug-toolbar==1.2.1
 flake8==2.2.2
 mccabe==0.2.1
+mock==1.0.1
 pep8==1.5.7
 psycopg2==2.5.3
 pyflakes==0.8.1
+requests==2.4.3
+six==1.7.3
+sqlparse==0.1.11
 wsgiref==0.1.2
