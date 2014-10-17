@@ -1,6 +1,7 @@
 Django==1.7
 Pillow==2.5.1
 coverage==3.7.1
+factory-boy==2.4.1
 mock==1.0.1
 pep8==1.5.7
 psycopg2==2.5.3
