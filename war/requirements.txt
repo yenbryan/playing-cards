@@ -1,5 +1,10 @@
-## The following requirements were added by pip --freeze:
 Django==1.7
 Pillow==2.5.1
+coverage==3.7.1
+mock==1.0.1
+pep8==1.5.7
 psycopg2==2.5.3
+pyflakes==0.8.1
+requests==2.4.3
+selenium==2.43.0
 wsgiref==0.1.2

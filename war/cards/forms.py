@@ -1,6 +1,8 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
+from django.core.mail import EmailMultiAlternatives
 from cards.models import Player
+from war import settings
 
 
 class EmailUserCreationForm(UserCreationForm):
@@ -22,3 +24,13 @@ class EmailUserCreationForm(UserCreationForm):
             self.error_messages['duplicate_username'],
             code='duplicate_username',
         )
+
+    def save(self, commit=True):
+        user = super(EmailUserCreationForm, self).save(commit=commit)
+        text_content = 'Thank you for signing up for our website, {}'.format(user.username)
+        html_content = '<h2>Thanks {} for signing up!</h2> <div>I hope you enjoy using our site</div>'\
+            .format(user.username)
+        msg = EmailMultiAlternatives("Welcome!", text_content, settings.DEFAULT_FROM_EMAIL, [user.email])
+        msg.attach_alternative(html_content, "text/html")
+        msg.send()
+        return user
